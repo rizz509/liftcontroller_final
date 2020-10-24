@@ -22,7 +22,7 @@ def user_GUI(name):
     label.config(width=200)
     label.config(font=("MS Serif", 90))
     label.pack()
-    root.after(1000, root.destroy)
+    root.after(5000, root.destroy)
     root.mainloop()
 
 def admin_GUI():
@@ -58,5 +58,3 @@ def admin_GUI():
     add_btn.grid(column=1, row=2,columnspan = btn_width,rowspan=btn_height)
     admin_frame.grid()
     root.mainloop()
-
-admin_GUI()

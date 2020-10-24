@@ -4,6 +4,8 @@ from queue import Queue
 from user import User
 from lift_GUI import *
 from time import sleep
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
 
 def display(in_q,out_q):
     # Create a VideoCapture object and read from input file
@@ -37,18 +39,17 @@ def display(in_q,out_q):
 
             if not in_q.empty():
                 cap.release()
-
+                out_q.put(False)
                 # Closes all the frames
                 cv2.destroyAllWindows()
                 user = User(in_q.get())
                 if user.type=="admin":
-                    out_q.put(False)
                     print(user)
                     a=input("hello type something")
-                    out_q.put(True)
                 cap = cv2.VideoCapture('white background.mp4')
                 if user.type=="user":
                     user_GUI(user.name)
+                out_q.put(True)
         # Break the loop
         else:
             break
@@ -62,9 +63,18 @@ def display(in_q,out_q):
 
 
 def take_input(out_q,in_q):
+    reader = SimpleMFRC522()
     while(True):
         if not in_q.empty() and in_q.get()==True:
-            out_q.put(int(input("give id")))
+            try:
+                print("accepting")
+                u,i=reader.read()
+                sleep(.5)
+                print(u,i)
+            
+            finally:
+                GPIO.cleanup()
+            out_q.put(i)
         else:
             print("not accepting")
         sleep(.3)

@@ -6,7 +6,7 @@ class User:
         self.type = self.getType()
 
     def getName(self):
-        return "Prapti"
+        return "hello6"
 
     def getFloor(self):
         return self.id
