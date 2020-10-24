@@ -4,8 +4,8 @@ from queue import Queue
 from user import User
 from lift_GUI import *
 from time import sleep
-import RPi.GPIO as GPIO
-from mfrc522 import SimpleMFRC522
+# import RPi.GPIO as GPIO
+# from mfrc522 import SimpleMFRC522
 
 def display(in_q,out_q):
     # Create a VideoCapture object and read from input file
@@ -42,13 +42,29 @@ def display(in_q,out_q):
                 out_q.put(False)
                 # Closes all the frames
                 cv2.destroyAllWindows()
-                user = User(in_q.get())
-                if user.type=="admin":
-                    print(user)
-                    a=input("hello type something")
-                cap = cv2.VideoCapture('white background.mp4')
-                if user.type=="user":
+                user = User(None,None,None,id=in_q.get())
+                while not in_q.empty():
+                    print("hi")
+                    trash=in_q.get()
+                if user.first_user or user.type=="admin":
+                    dt=admin_GUI()
+                    if dt.floor==None:
+                        pass
+                    else:
+                        out_q.put(True)
+                        while in_q.empty():
+                            continue
+                        id=in_q.get()
+                        u=User("Default user",floor=dt.floor,type=dt.type,id=id)
+                        u.setUser()
+                        out_q.put(False)
+                        sleep(.5)
+                elif user.type=="user":
                     user_GUI(user.name)
+                    gotofloor(user.floor,Tk())
+                else:
+                    user_GUI("Invalid")
+                cap = cv2.VideoCapture('white background.mp4')
                 out_q.put(True)
         # Break the loop
         else:
@@ -63,21 +79,21 @@ def display(in_q,out_q):
 
 
 def take_input(out_q,in_q):
-    reader = SimpleMFRC522()
+    #reader = SimpleMFRC522()
     while(True):
         if not in_q.empty() and in_q.get()==True:
-            try:
-                print("accepting")
-                u,i=reader.read()
-                sleep(.5)
-                print(u,i)
-            
-            finally:
-                GPIO.cleanup()
-            out_q.put(i)
+            # try:
+            #     print("accepting")
+            #     u,i=reader.read()
+            #     sleep(.5)
+            #     print(u,i)
+            #
+            # finally:
+            #     GPIO.cleanup()
+             out_q.put(input("say"))
         else:
-            print("not accepting")
-        sleep(.3)
+            pass
+            # print("not accepting")
 
 q = Queue()
 q1 = Queue()
